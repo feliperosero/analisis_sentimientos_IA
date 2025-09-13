@@ -116,4 +116,5 @@ Thumbs.db
 # Custom artifacts (keep only essential)
 artifacts/*.joblib
 artifacts/*.png
+!artifacts/diagrama_arq_sentimientos.png
 outputs/*.parquet
