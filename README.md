@@ -1,6 +1,6 @@
 # Análisis de Sentimientos con IA
 
-Un proyecto de clasificación de sentimientos usando modelos de transformers y PyTorch Lightning.
+Un proyecto de clasificación de sentimientos usando modelos de transformers y PyTorch Lightning para analizar el sentimiento de los posts de Reddit frente a la IA.
 
 ## Descripción
 
