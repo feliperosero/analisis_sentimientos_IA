@@ -147,8 +147,8 @@ Los resultados se guardan automáticamente en `artifacts/` y se generan visualiz
 
 ## Diagrama de arquitectura
 
-El diagrama conceptual de la arquitectura del modelo se encuentra en `artifacts/diagrama_arq_sentimientos.svg` y `artifacts/diagrama_arq_sentimientos.png`.
+El diagrama conceptual de la arquitectura del modelo se encuentra en `artifacts/plots/diagrama_arq_sentimientos.svg` y `artifacts/plots/diagrama_arq_sentimientos.png`.
 
-![Arquitectura del modelo (SVG)](artifacts/diagrama_arq_sentimientos.svg)
+![Arquitectura del modelo (SVG)](artifacts/plots/diagrama_arq_sentimientos.svg)
 
-![Arquitectura del modelo (PNG)](artifacts/diagrama_arq_sentimientos.png)
+![Arquitectura del modelo (PNG)](artifacts/plots/diagrama_arq_sentimientos.png)

@@ -14,8 +14,7 @@
     </marker>
   </defs>
 
-  <!-- Título -->
-  <text x="600" y="36" text-anchor="middle" class="title">Arquitectura conceptual: Análisis de Sentimientos en Reddit (Ciencia y Tecnología)</text>
+  <!-- Título eliminado a solicitud -->
 
   <!-- Column guides (optional faint) -->
   <rect x="40" y="60" width="520" height="600" fill="#f9fafb" stroke="#eee"/>
@@ -61,11 +60,16 @@
 
   <!-- RIGHT: Clasificación -->
   <!-- Concatenation -->
-  <rect class="box" x="720" y="528" width="380" height="50" fill="#A7E3D8" />
-  <text class="label" x="910" y="545" text-anchor="middle">Concatenation (C + metadatos de Reddit: upvotes, karma, subreddit)</text>
+  <!-- Aumentar altura y centrar para permitir dos líneas de texto -->
+  <rect class="box" x="720" y="521" width="380" height="64" fill="#A7E3D8" />
+  <text class="label" x="910" y="545" text-anchor="middle">
+    <tspan x="910" dy="-4">Concatenation</tspan>
+    <tspan x="910" dy="18" class="small">(C + metadatos de Reddit: upvotes, karma, subreddit)</tspan>
+  </text>
 
   <!-- Upwards stack to final output -->
-  <path class="arrow" d="M910,528 L910,504" marker-end="url(#arrowhead)" />
+  <!-- Ajuste del conector superior por cambio de altura -->
+  <path class="arrow" d="M910,521 L910,504" marker-end="url(#arrowhead)" />
   <rect class="box" x="800" y="454" width="220" height="44" fill="#D6C6F0" />
   <text class="label" x="910" y="480" text-anchor="middle">Dropout</text>
 

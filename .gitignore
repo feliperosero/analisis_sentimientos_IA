@@ -117,4 +117,6 @@ Thumbs.db
 artifacts/*.joblib
 artifacts/*.png
 !artifacts/diagrama_arq_sentimientos.png
+!artifacts/plots/
+!artifacts/plots/*.png
 outputs/*.parquet
