@@ -144,4 +144,9 @@ Los resultados se guardan automáticamente en `artifacts/` y se generan visualiz
 - categorias_contenido_json, etiquetas_tratamiento_json
 - premiadores_json, premiaciones_json, gildings_json, datos_encuesta_json
 - raw_payload, extras
-````
+
+## Diagrama de arquitectura
+
+El diagrama conceptual de la arquitectura del modelo se encuentra en `artifacts/diagrama_arq_sentimientos.svg`.
+
+![Arquitectura del modelo](artifacts/diagrama_arq_sentimientos.svg)

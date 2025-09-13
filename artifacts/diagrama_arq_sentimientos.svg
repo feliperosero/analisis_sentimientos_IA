@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <defs>
+    <style>
+      .title { font: 600 18px 'DejaVu Sans', Arial, sans-serif; fill: #333; }
+      .label { font: 500 14px 'DejaVu Sans', Arial, sans-serif; fill: #222; }
+      .small { font: 500 12px 'DejaVu Sans', Arial, sans-serif; fill: #333; }
+      .box { stroke: #444; stroke-width: 1.2; rx: 8; ry: 8; }
+      .arrow { stroke: #555; stroke-width: 1.4; fill: none; }
+      marker#arrowhead { markerWidth: 10; markerHeight: 7; refX: 9; refY: 3.5; orient: auto; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+    </marker>
+  </defs>
+
+  <!-- Título -->
+  <text x="600" y="36" text-anchor="middle" class="title">Arquitectura conceptual: Análisis de Sentimientos en Reddit (Ciencia y Tecnología)</text>
+
+  <!-- Column guides (optional faint) -->
+  <rect x="40" y="60" width="520" height="600" fill="#f9fafb" stroke="#eee"/>
+  <rect x="640" y="60" width="520" height="600" fill="#f9fafb" stroke="#eee"/>
+  <text x="300" y="80" text-anchor="middle" class="small" fill="#666">Flujo de texto (representación)</text>
+  <text x="900" y="80" text-anchor="middle" class="small" fill="#666">Flujo de clasificación</text>
+
+  <!-- LEFT: Texto -->
+  <!-- Input -->
+  <rect class="box" x="80" y="110" width="440" height="54" fill="#B0B0B0" />
+  <text class="label" x="300" y="142" text-anchor="middle">Input: publicaciones de Reddit (ciencia y tecnología)</text>
+
+  <!-- Tokenizer -->
+  <rect class="box" x="100" y="190" width="400" height="54" fill="#E6E6E6" />
+  <text class="label" x="300" y="222" text-anchor="middle">Pre-trained XLM-RoBERTaTokenizer</text>
+
+  <!-- Contextualización -->
+  <rect class="box" x="120" y="270" width="360" height="54" fill="#F8C18C" />
+  <text class="label" x="300" y="302" text-anchor="middle">Contextualización Reddit (IA en ciencia y tecnología)</text>
+
+  <!-- Transformer Blocks (stacked) -->
+  <g>
+    <rect class="box" x="140" y="350" width="320" height="46" fill="#A8D0F0" />
+    <text class="label" x="300" y="378" text-anchor="middle">Transformer Block</text>
+    <rect class="box" x="140" y="404" width="320" height="46" fill="#A8D0F0" />
+    <text class="label" x="300" y="432" text-anchor="middle">Transformer Block</text>
+    <rect class="box" x="140" y="458" width="320" height="46" fill="#A8D0F0" />
+    <text class="label" x="300" y="486" text-anchor="middle">Transformer Block</text>
+  </g>
+
+  <!-- Output C -->
+  <rect class="box" x="200" y="528" width="200" height="50" fill="#FFFFFF" />
+  <text class="label" x="300" y="558" text-anchor="middle">C (representación del texto)</text>
+
+  <!-- Arrows in left column -->
+  <path class="arrow" d="M300,164 L300,190" marker-end="url(#arrowhead)" />
+  <path class="arrow" d="M300,244 L300,270" marker-end="url(#arrowhead)" />
+  <path class="arrow" d="M300,324 L300,350" marker-end="url(#arrowhead)" />
+  <path class="arrow" d="M300,504 L300,528" marker-end="url(#arrowhead)" />
+
+  <!-- Bridge from C to right flow (Concatenation) -->
+  <path class="arrow" d="M400,553 C520,553 620,553 720,553" marker-end="url(#arrowhead)" />
+
+  <!-- RIGHT: Clasificación -->
+  <!-- Concatenation -->
+  <rect class="box" x="720" y="528" width="380" height="50" fill="#A7E3D8" />
+  <text class="label" x="910" y="545" text-anchor="middle">Concatenation (C + metadatos de Reddit: upvotes, karma, subreddit)</text>
+
+  <!-- Upwards stack to final output -->
+  <path class="arrow" d="M910,528 L910,504" marker-end="url(#arrowhead)" />
+  <rect class="box" x="800" y="454" width="220" height="44" fill="#D6C6F0" />
+  <text class="label" x="910" y="480" text-anchor="middle">Dropout</text>
+
+  <path class="arrow" d="M910,454 L910,430" marker-end="url(#arrowhead)" />
+  <rect class="box" x="800" y="386" width="220" height="44" fill="#B7E1B5" />
+  <text class="label" x="910" y="412" text-anchor="middle">Linear</text>
+
+  <path class="arrow" d="M910,386 L910,362" marker-end="url(#arrowhead)" />
+  <rect class="box" x="800" y="318" width="220" height="44" fill="#F7C6D9" />
+  <text class="label" x="910" y="344" text-anchor="middle">Tanh</text>
+
+  <path class="arrow" d="M910,318 L910,294" marker-end="url(#arrowhead)" />
+  <rect class="box" x="800" y="250" width="220" height="44" fill="#D6C6F0" />
+  <text class="label" x="910" y="276" text-anchor="middle">Dropout</text>
+
+  <path class="arrow" d="M910,250 L910,226" marker-end="url(#arrowhead)" />
+  <rect class="box" x="800" y="182" width="220" height="44" fill="#B7E1B5" />
+  <text class="label" x="910" y="208" text-anchor="middle">Linear</text>
+
+  <path class="arrow" d="M910,182 L910,158" marker-end="url(#arrowhead)" />
+  <rect class="box" x="780" y="114" width="260" height="44" fill="#F7C6D9" />
+  <text class="label" x="910" y="140" text-anchor="middle">Softmax</text>
+
+  <!-- Final Output on top -->
+  <path class="arrow" d="M910,114 L910,96" marker-end="url(#arrowhead)" />
+  <rect class="box" x="740" y="60" width="340" height="40" fill="#FFFFFF" />
+  <text class="label" x="910" y="85" text-anchor="middle">Sentimiento (Positivo, Negativo, Neutral)</text>
+
+</svg>
