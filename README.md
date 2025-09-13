@@ -103,23 +103,45 @@ Los resultados se guardan automáticamente en `artifacts/` y se generan visualiz
 
 ## Datos
 
-Los datos se procesan en tres niveles:
-- **Bronze**: Datos crudos originales
-- **Silver**: Datos limpiados y preprocesados
-- **Gold**: Datos finales listos para modelado
+### Identificación y autoría
+- id, autor, autor_nombre_completo, autor_premium, autor_patreon, autor_bloqueado
+- autor_flair_texto, autor_flair_css, autor_flair_tipo, autor_flair_richtext_json
 
-## Contribuir
+### Contenido principal
+- titulo, texto, titulo_limpio, texto_limpio
+- dominio, url, url_destino, enlace_permanente
+- flair_texto, flair_css, flair_tipo, flair_richtext_json
+- pista_contenido
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-caracteristica`)
-3. Commit tus cambios (`git commit -am 'Agrega nueva característica'`)
-4. Push a la rama (`git push origin feature/nueva-caracteristica`)
-5. Abre un Pull Request
+### Subreddit
+- subreddit_nombre, subreddit_id, subreddit_prefijado, subreddit_tipo, subreddit_suscriptores
 
-## Licencia
+### Tiempos/estado
+- fecha_creacion_utc, fecha_creacion, editado, editado_fecha, distinguido
+- esta_bloqueado, archivado, en_cuarentena, esta_fijado
+- es_original, es_meta, es_compartible
+- orden_sugerido, tipo_discusion
+- _ingest_ts, _ingest_ts_ts
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo LICENSE para más detalles.
+### Interacciones
+- puntaje, votos_positivos, votos_negativos, ratio_upvotes
+- total_comentarios, total_republicaciones, vistas
+- visitado, ocultar_puntaje, enviar_respuestas, puede_mod
+- total_premios, gilded
 
-## Autor
+### Seguridad / flags
+- es_texto, es_adulto, es_spoiler, indexable_por_robot
 
-Felipe Rosero
+### Media/embeds
+- es_video, es_galeria, solo_media
+- miniatura, miniatura_alto, miniatura_ancho
+- media_json, media_segura_json, media_embed_json, media_segura_embed_json
+- previsualizacion_json, datos_galeria_json, metadatos_media_json
+- lista_republicaciones_json, padre_republicacion
+
+### Metadatos adicionales
+- estado_lista_blanca_padre, estado_lista_blanca, wls, pwls
+- categorias_contenido_json, etiquetas_tratamiento_json
+- premiadores_json, premiaciones_json, gildings_json, datos_encuesta_json
+- raw_payload, extras
+````
