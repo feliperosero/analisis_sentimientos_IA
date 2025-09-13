@@ -1,0 +1,418 @@
+@prefix rr:   <https://wfr.ai/onto/reddit#> .
+@prefix :     <https://wfr.ai/onto/reddit#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontología
+############################
+
+<https://wfr.ai/onto/reddit/> a owl:Ontology ;
+  rdfs:label "Ontología de Reddit (versión mejorada)"@es ;
+  rdfs:comment "Ontología base para modelar publicaciones, autores y subreddits con variables de la capa Silver para ingeniería de características. Incluye subclases por tipo de contenido."@es ;
+  rdfs:isDefinedBy "William Felipe Rosero Polo" ;
+  owl:versionInfo "0.4" .
+
+# Datatype auxiliar para JSON serializado
+rr:JSONLiteral a rdfs:Datatype ;
+  rdfs:label "JSON (serializado como string)"@es ;
+  rdfs:comment "Literal JSON almacenado como cadena UTF-8; validar con SHACL si se requiere."@es .
+
+############################
+# Clases
+############################
+
+rr:Publicacion a owl:Class ;
+  rdfs:label "Publicación"@es ;
+  rdfs:comment "Entidad principal: post de Reddit ya normalizado en Silver."@es .
+
+rr:Autor a owl:Class ;
+  rdfs:label "Autor"@es ;
+  rdfs:comment "Cuenta de usuario que crea publicaciones."@es .
+
+rr:Subreddit a owl:Class ;
+  rdfs:label "Subreddit"@es ;
+  rdfs:comment "Foro temático de Reddit."@es .
+
+# Disjuntas (evita solapamientos indeseados en inferencia)
+rr:Publicacion owl:disjointWith rr:Autor , rr:Subreddit .
+rr:Autor       owl:disjointWith rr:Subreddit .
+
+# Subclases por tipo de contenido (para consultas/razonamiento)
+rr:PublicacionTexto a owl:Class ;
+  rdfs:label "Publicación de texto"@es ;
+  rdfs:subClassOf rr:Publicacion ,
+    [ a owl:Restriction ; owl:onProperty rr:es_texto  ; owl:hasValue true ] .
+
+rr:PublicacionVideo a owl:Class ;
+  rdfs:label "Publicación con video"@es ;
+  rdfs:subClassOf rr:Publicacion ,
+    [ a owl:Restriction ; owl:onProperty rr:es_video  ; owl:hasValue true ] .
+
+rr:PublicacionGaleria a owl:Class ;
+  rdfs:label "Publicación con galería"@es ;
+  rdfs:subClassOf rr:Publicacion ,
+    [ a owl:Restriction ; owl:onProperty rr:es_galeria ; owl:hasValue true ] .
+
+# Disjuntas entre subclases (opcional pero útil)
+rr:PublicacionTexto  owl:disjointWith rr:PublicacionVideo , rr:PublicacionGaleria .
+rr:PublicacionVideo  owl:disjointWith rr:PublicacionGaleria .
+
+# Clases de sentimiento para análisis enriquecido
+rr:PostPositivo a owl:Class ;
+  rdfs:label "Post Positivo"@es ;
+  rdfs:comment "Publicación con sentimiento positivo detectado"@es ;
+  rdfs:subClassOf rr:Publicacion .
+
+rr:PostNegativo a owl:Class ;
+  rdfs:label "Post Negativo"@es ;
+  rdfs:comment "Publicación con sentimiento negativo detectado"@es ;
+  rdfs:subClassOf rr:Publicacion .
+
+rr:PostNeutral a owl:Class ;
+  rdfs:label "Post Neutral"@es ;
+  rdfs:comment "Publicación con sentimiento neutral detectado"@es ;
+  rdfs:subClassOf rr:Publicacion .
+
+# Clases de intensidad emocional
+rr:IntensidadEmocional a owl:Class ;
+  rdfs:label "Intensidad Emocional"@es ;
+  rdfs:comment "Nivel de intensidad emocional de una publicación"@es .
+
+rr:IntensidadBaja a owl:Class ;
+  rdfs:label "Intensidad Baja"@es ;
+  rdfs:comment "Baja intensidad emocional (0.0-0.3)"@es ;
+  rdfs:subClassOf rr:IntensidadEmocional .
+
+rr:IntensidadMedia a owl:Class ;
+  rdfs:label "Intensidad Media"@es ;
+  rdfs:comment "Media intensidad emocional (0.3-0.7)"@es ;
+  rdfs:subClassOf rr:IntensidadEmocional .
+
+rr:IntensidadAlta a owl:Class ;
+  rdfs:label "Intensidad Alta"@es ;
+  rdfs:comment "Alta intensidad emocional (0.7-1.0)"@es ;
+  rdfs:subClassOf rr:IntensidadEmocional .
+
+# Disjuntas entre clases de sentimiento
+rr:PostPositivo owl:disjointWith rr:PostNegativo , rr:PostNeutral .
+rr:PostNegativo owl:disjointWith rr:PostNeutral .
+
+# Disjuntas entre clases de intensidad
+rr:IntensidadBaja owl:disjointWith rr:IntensidadMedia , rr:IntensidadAlta .
+rr:IntensidadMedia owl:disjointWith rr:IntensidadAlta .
+
+############################
+# Propiedades de objeto
+############################
+
+# Núcleo (con inversas y funcionalidad)
+rr:tieneAutor a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "tiene autor"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range  rr:Autor ;
+  owl:inverseOf rr:esAutorDe .
+
+rr:esAutorDe a owl:ObjectProperty ;
+  rdfs:label "es autor de"@es ;
+  rdfs:domain rr:Autor ;
+  rdfs:range  rr:Publicacion .
+
+rr:perteneceASubreddit a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "pertenece a subreddit"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range  rr:Subreddit ;
+  owl:inverseOf rr:esSubredditDe .
+
+rr:esSubredditDe a owl:ObjectProperty ;
+  rdfs:label "es subreddit de"@es ;
+  rdfs:domain rr:Subreddit ;
+  rdfs:range  rr:Publicacion .
+
+# Propiedades de objeto para sentimiento y contexto emocional
+rr:tienePolaridadSentimiento a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "tiene polaridad de sentimiento"@es ;
+  rdfs:comment "Relaciona una publicación con su clase de sentimiento"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range  [ owl:unionOf ( rr:PostPositivo rr:PostNegativo rr:PostNeutral ) ] .
+
+rr:tieneIntensidadEmocional a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "tiene intensidad emocional"@es ;
+  rdfs:comment "Relaciona una publicación con su nivel de intensidad emocional"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range  rr:IntensidadEmocional .
+
+# Propiedades de objeto para relaciones contextuales de sentimiento
+rr:comparteSentimientoCon a owl:ObjectProperty , owl:SymmetricProperty ;
+  rdfs:label "comparte sentimiento con"@es ;
+  rdfs:comment "Indica que dos publicaciones comparten sentimiento similar"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range  rr:Publicacion .
+
+rr:contradiceElSentimientoDe a owl:ObjectProperty ;
+  rdfs:label "contradice el sentimiento de"@es ;
+  rdfs:comment "Indica que una publicación contradice el sentimiento de otra"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range  rr:Publicacion ;
+  owl:inverseOf rr:esSentimientoContradichotPor .
+
+rr:esSentimientoContradichotPor a owl:ObjectProperty ;
+  rdfs:label "es sentimiento contradicho por"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range  rr:Publicacion .
+
+rr:influyeEnElSentimientoDe a owl:ObjectProperty ;
+  rdfs:label "influye en el sentimiento de"@es ;
+  rdfs:comment "Indica que una publicación influye en el sentimiento de otra"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range  rr:Publicacion ;
+  owl:inverseOf rr:esSentimientoInfluidoPor .
+
+rr:esSentimientoInfluidoPor a owl:ObjectProperty ;
+  rdfs:label "es sentimiento influido por"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range  rr:Publicacion .
+
+############################
+# Propiedades de datos (Publicación)
+############################
+
+# Identificación y texto
+rr:id a owl:DatatypeProperty ;
+  rdfs:label "id"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:titulo a owl:DatatypeProperty ;
+  rdfs:label "título"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:texto a owl:DatatypeProperty ;
+  rdfs:label "texto"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+
+# Autor (campos denormalizados desde Silver)
+rr:autor a owl:DatatypeProperty ;
+  rdfs:label "autor (nombre de usuario)"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:autor_nombre_completo a owl:DatatypeProperty ;
+  rdfs:label "autor nombre completo"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:autor_premium a owl:DatatypeProperty ;
+  rdfs:label "autor premium"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:autor_patreon a owl:DatatypeProperty ;
+  rdfs:label "autor patreon"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:autor_flair_texto a owl:DatatypeProperty ;
+  rdfs:label "autor flair texto"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:autor_flair_css a owl:DatatypeProperty ;
+  rdfs:label "autor flair css"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:autor_flair_tipo a owl:DatatypeProperty ;
+  rdfs:label "autor flair tipo"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:autor_flair_richtext_json a owl:DatatypeProperty ;
+  rdfs:label "autor flair richtext json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+
+# Subreddit (denormalizado)
+rr:subreddit_nombre a owl:DatatypeProperty ;
+  rdfs:label "subreddit nombre"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:subreddit_id a owl:DatatypeProperty ;
+  rdfs:label "subreddit id"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:subreddit_prefijado a owl:DatatypeProperty ;
+  rdfs:label "subreddit prefijado"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:subreddit_tipo a owl:DatatypeProperty ;
+  rdfs:label "subreddit tipo"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:subreddit_suscriptores a owl:DatatypeProperty ;
+  rdfs:label "subreddit suscriptores"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+
+# Fechas y edición
+rr:fecha_creacion_utc a owl:DatatypeProperty ;
+  rdfs:label "fecha creación utc (epoch)"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:fecha_creacion a owl:DatatypeProperty ;
+  rdfs:label "fecha creación"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:dateTime .
+rr:editado a owl:DatatypeProperty ;
+  rdfs:label "editado"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:editado_fecha a owl:DatatypeProperty ;
+  rdfs:label "fecha edición"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:dateTime .
+
+# Flags de contenido/moderación
+rr:distinguido a owl:DatatypeProperty ; rdfs:label "distinguido"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:es_texto a owl:DatatypeProperty ; rdfs:label "es solo texto"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:es_adulto a owl:DatatypeProperty ; rdfs:label "es adulto"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:es_spoiler a owl:DatatypeProperty ; rdfs:label "es spoiler"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:esta_bloqueado a owl:DatatypeProperty ; rdfs:label "está bloqueado"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:archivado a owl:DatatypeProperty ; rdfs:label "archivado"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:en_cuarentena a owl:DatatypeProperty ; rdfs:label "en cuarentena"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:esta_fijado a owl:DatatypeProperty ; rdfs:label "está fijado"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:es_original a owl:DatatypeProperty ; rdfs:label "es original"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:es_meta a owl:DatatypeProperty ; rdfs:label "es meta"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:es_compartible a owl:DatatypeProperty ; rdfs:label "es compartible"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+
+# Métricas y votos
+rr:puntaje a owl:DatatypeProperty ; rdfs:label "puntaje"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:votos_positivos a owl:DatatypeProperty ; rdfs:label "votos positivos"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:votos_negativos a owl:DatatypeProperty ; rdfs:label "votos negativos"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:ratio_upvotes a owl:DatatypeProperty ; rdfs:label "ratio upvotes"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:decimal .
+rr:total_comentarios a owl:DatatypeProperty ; rdfs:label "total comentarios"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:total_republicaciones a owl:DatatypeProperty ; rdfs:label "total republicaciones"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:vistas a owl:DatatypeProperty ; rdfs:label "vistas"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+
+# Preferencias/estado de visualización
+rr:visitado a owl:DatatypeProperty ; rdfs:label "visitado"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:ocultar_puntaje a owl:DatatypeProperty ; rdfs:label "ocultar puntaje"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:enviar_respuestas a owl:DatatypeProperty ; rdfs:label "enviar respuestas"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:puede_mod a owl:DatatypeProperty ; rdfs:label "puede moderar"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:orden_sugerido a owl:DatatypeProperty ; rdfs:label "orden sugerido"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+
+# Enlaces y recursos
+rr:dominio a owl:DatatypeProperty ; rdfs:label "dominio"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:url a owl:DatatypeProperty ; rdfs:label "url"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:anyURI .
+rr:url_destino a owl:DatatypeProperty ; rdfs:label "url destino"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:anyURI .
+rr:enlace_permanente a owl:DatatypeProperty ; rdfs:label "enlace permanente"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:anyURI .
+
+# Miniatura / media
+rr:miniatura a owl:DatatypeProperty ; rdfs:label "miniatura"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:anyURI .
+rr:miniatura_alto a owl:DatatypeProperty ; rdfs:label "miniatura alto"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:miniatura_ancho a owl:DatatypeProperty ; rdfs:label "miniatura ancho"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:pista_contenido a owl:DatatypeProperty ; rdfs:label "pista contenido"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:es_video a owl:DatatypeProperty ; rdfs:label "es video"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:es_galeria a owl:DatatypeProperty ; rdfs:label "es galería"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:solo_media a owl:DatatypeProperty ; rdfs:label "solo media"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+
+# JSONs de media y metadatos
+rr:media_json a owl:DatatypeProperty ; rdfs:label "media json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:media_segura_json a owl:DatatypeProperty ; rdfs:label "media segura json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:media_embed_json a owl:DatatypeProperty ; rdfs:label "media embed json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:media_segura_embed_json a owl:DatatypeProperty ; rdfs:label "media segura embed json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:previsualizacion_json a owl:DatatypeProperty ; rdfs:label "previsualización json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:datos_galeria_json a owl:DatatypeProperty ; rdfs:label "datos galería json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:metadatos_media_json a owl:DatatypeProperty ; rdfs:label "metadatos media json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+
+# Flair (post)
+rr:flair_texto a owl:DatatypeProperty ; rdfs:label "flair texto"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:flair_css a owl:DatatypeProperty ; rdfs:label "flair css"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:flair_tipo a owl:DatatypeProperty ; rdfs:label "flair tipo"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:flair_richtext_json a owl:DatatypeProperty ; rdfs:label "flair richtext json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+
+# Republicaciones / relaciones
+rr:padre_republicacion a owl:DatatypeProperty ; rdfs:label "padre republicación (id)"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:lista_republicaciones_json a owl:DatatypeProperty ; rdfs:label "lista republicaciones json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+
+# Listas blancas / moderación
+rr:estado_lista_blanca_padre a owl:DatatypeProperty ; rdfs:label "estado lista blanca padre"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:estado_lista_blanca a owl:DatatypeProperty ; rdfs:label "estado lista blanca"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:wls a owl:DatatypeProperty ; rdfs:label "wls"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:pwls a owl:DatatypeProperty ; rdfs:label "pwls"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+
+# Categorías/etiquetas
+rr:categorias_contenido_json a owl:DatatypeProperty ; rdfs:label "categorías contenido json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:tipo_discusion a owl:DatatypeProperty ; rdfs:label "tipo discusión"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:string .
+rr:etiquetas_tratamiento_json a owl:DatatypeProperty ; rdfs:label "etiquetas tratamiento json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:indexable_por_robot a owl:DatatypeProperty ; rdfs:label "indexable por robot"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+
+# Bloqueos y premios
+rr:autor_bloqueado a owl:DatatypeProperty ; rdfs:label "autor bloqueado"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:boolean .
+rr:premiadores_json a owl:DatatypeProperty ; rdfs:label "premiadores json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:premiaciones_json a owl:DatatypeProperty ; rdfs:label "premiaciones json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+rr:total_premios a owl:DatatypeProperty ; rdfs:label "total premios"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:gilded a owl:DatatypeProperty ; rdfs:label "gilded"@es ; rdfs:domain rr:Publicacion ; rdfs:range xsd:integer .
+rr:gildings_json a owl:DatatypeProperty ; rdfs:label "gildings json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+
+# Encuestas
+rr:datos_encuesta_json a owl:DatatypeProperty ;
+  rdfs:label "datos encuesta json"@es ; rdfs:domain rr:Publicacion ; rdfs:range rr:JSONLiteral .
+
+# Propiedades de datos para análisis de sentimiento
+rr:valorSentimiento a owl:DatatypeProperty ;
+  rdfs:label "valor de sentimiento"@es ;
+  rdfs:comment "Valor numérico del sentimiento (-1.0 a +1.0)"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range xsd:decimal .
+
+rr:confianzaSentimiento a owl:DatatypeProperty ;
+  rdfs:label "confianza del sentimiento"@es ;
+  rdfs:comment "Nivel de confianza en la predicción de sentimiento (0.0 a 1.0)"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range xsd:decimal .
+
+rr:complejidadLinguistica a owl:DatatypeProperty ;
+  rdfs:label "complejidad lingüística"@es ;
+  rdfs:comment "Medida de complejidad del texto de la publicación"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range xsd:decimal .
+
+rr:nivelEngagement a owl:DatatypeProperty ;
+  rdfs:label "nivel de engagement"@es ;
+  rdfs:comment "Medida del nivel de interacción generado por la publicación"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range xsd:decimal .
+
+rr:historalSentimientoAutor a owl:DatatypeProperty ;
+  rdfs:label "historial de sentimiento del autor"@es ;
+  rdfs:comment "Promedio histórico de sentimiento de las publicaciones del autor"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range xsd:decimal .
+
+rr:tendenciaSentimientoSubreddit a owl:DatatypeProperty ;
+  rdfs:label "tendencia de sentimiento del subreddit"@es ;
+  rdfs:comment "Tendencia promedio de sentimiento en el subreddit"@es ;
+  rdfs:domain rr:Publicacion ;
+  rdfs:range xsd:decimal .
+
+############################
+# Propiedades de datos (Autor)
+############################
+
+rr:autor_nombre a owl:DatatypeProperty ; rdfs:label "nombre de usuario"@es ; rdfs:domain rr:Autor ; rdfs:range xsd:string .
+rr:autor_nombre_completo_val a owl:DatatypeProperty ; rdfs:label "nombre completo"@es ; rdfs:domain rr:Autor ; rdfs:range xsd:string .
+rr:autor_es_premium a owl:DatatypeProperty ; rdfs:label "es premium"@es ; rdfs:domain rr:Autor ; rdfs:range xsd:boolean .
+rr:autor_tiene_patreon a owl:DatatypeProperty ; rdfs:label "tiene patreon"@es ; rdfs:domain rr:Autor ; rdfs:range xsd:boolean .
+rr:autor_bloqueado_val a owl:DatatypeProperty ; rdfs:label "bloqueado"@es ; rdfs:domain rr:Autor ; rdfs:range xsd:boolean .
+
+############################
+# Propiedades de datos (Subreddit)
+############################
+
+rr:subreddit_nombre_val a owl:DatatypeProperty ; rdfs:label "nombre"@es ; rdfs:domain rr:Subreddit ; rdfs:range xsd:string .
+rr:subreddit_id_val a owl:DatatypeProperty ; rdfs:label "id"@es ; rdfs:domain rr:Subreddit ; rdfs:range xsd:string .
+rr:subreddit_tipo_val a owl:DatatypeProperty ; rdfs:label "tipo"@es ; rdfs:domain rr:Subreddit ; rdfs:range xsd:string .
+rr:subreddit_suscriptores_val a owl:DatatypeProperty ; rdfs:label "suscriptores"@es ; rdfs:domain rr:Subreddit ; rdfs:range xsd:integer .
+
+############################
+# Restricciones mínimas útiles
+############################
+
+rr:Publicacion rdfs:subClassOf
+  [ a owl:Restriction ; owl:onProperty rr:titulo ;             owl:minCardinality "1"^^xsd:nonNegativeInteger ],
+  [ a owl:Restriction ; owl:onProperty rr:fecha_creacion ;      owl:minCardinality "1"^^xsd:nonNegativeInteger ],
+  [ a owl:Restriction ; owl:onProperty rr:tieneAutor ;          owl:cardinality     "1"^^xsd:nonNegativeInteger ],
+  [ a owl:Restriction ; owl:onProperty rr:perteneceASubreddit ; owl:cardinality     "1"^^xsd:nonNegativeInteger ] .
+
+############################
+# Individuos de prueba
+############################
+
+# Subreddit de ejemplo
+rr:subredditTecnologia a rr:Subreddit ;
+  rdfs:label "r/technology"@es ;
+  rr:subreddit_nombre_val "technology" ;
+  rr:subreddit_id_val "t5_2qh16" ;
+  rr:subreddit_tipo_val "public" ;
+  rr:subreddit_suscriptores_val 15000000 .
+
+# Autor de ejemplo
+rr:usuarioFelipe a rr:Autor ;
+  rdfs:label "usuario felipe"@es ;
+  rr:autor_nombre "felipe_rosero" ;
+  rr:autor_nombre_completo_val "Felipe Rosero" ;
+  rr:autor_es_premium false ;
+  rr:autor_tiene_patreon false ;
+  rr:autor_bloqueado_val false .
+
+# Publicación (coherente con es_texto = true)
+rr:postIA a rr:PublicacionTexto ;
+  rdfs:label "post de IA de prueba"@es ;
+  rr:id "abc123" ;
+  rr:titulo "La IA está revolucionando el mundo" ;
+  rr:texto "Una reflexión breve sobre las últimas aplicaciones de IA." ;
+  rr:fecha_creacion "2025-09-06T18:00:00"^^xsd:dateTime ;
+  rr:fecha_creacion_utc "1757172000"^^xsd:integer ;
+  rr:puntaje 120 ;
+  rr:total_comentarios 35 ;
+  rr:es_texto true ;
+  rr:url <https://www.reddit.com/r/technology/comments/abc123> ;
+  rr:enlace_permanente <https://www.reddit.com/r/technology/comments/abc123/> ;
+  rr:tieneAutor rr:usuarioFelipe ;
+  rr:perteneceASubreddit rr:subredditTecnologia .

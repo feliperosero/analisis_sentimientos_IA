@@ -1,0 +1,141 @@
+@prefix : <http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5/> .
+
+<http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Diagnostico_de
+:Diagnostico_de rdf:type owl:ObjectProperty ;
+                rdfs:domain :Paciente ;
+                rdfs:range :Enfermedad .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Sintoma
+:Sintoma rdf:type owl:ObjectProperty ;
+         owl:inverseOf :Sintoma_de ;
+         rdfs:domain :Enfermedad ;
+         rdfs:range :Sintoma .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Sintoma_de
+:Sintoma_de rdf:type owl:ObjectProperty ;
+            rdfs:domain :Sintoma ;
+            rdfs:range :Enfermedad .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Tratada_con
+:Tratada_con rdf:type owl:ObjectProperty ;
+             rdfs:domain :Enfermedad ;
+             rdfs:range :Tratamiento .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Tratamiento_de
+:Tratamiento_de rdf:type owl:ObjectProperty ;
+                rdfs:domain :Tratamiento ;
+                rdfs:range :Enfermedad .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Codigo
+:Codigo rdf:type owl:DatatypeProperty ;
+        rdfs:domain :Enfermedad ,
+                    :Sintoma ,
+                    :Tratamiento ;
+        rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Edad
+:Edad rdf:type owl:DatatypeProperty ;
+      rdfs:domain :Paciente ;
+      rdfs:range xsd:int .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Nombre
+:Nombre rdf:type owl:DatatypeProperty ;
+        rdfs:domain :Enfermedad ,
+                    :Paciente ,
+                    :Sintoma ,
+                    :Tratamiento ;
+        rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Numero_Seguro_Social
+:Numero_Seguro_Social rdf:type owl:DatatypeProperty ;
+                      rdfs:domain :Paciente ;
+                      rdfs:range xsd:string .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Peso
+:Peso rdf:type owl:DatatypeProperty ;
+      rdfs:domain :Paciente ;
+      rdfs:range xsd:float .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Enfermedad
+:Enfermedad rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Paciente
+:Paciente rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Sintoma
+:Sintoma rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Tratamiento
+:Tratamiento rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Enfermedad1
+:Enfermedad1 rdf:type owl:NamedIndividual ,
+                      :Enfermedad ;
+             :Sintoma_de :Sintoma1 ;
+             :Tratada_con :Tratamiento ;
+             :Codigo "1as" ;
+             :Nombre "gripe" .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Paciente1
+:Paciente1 rdf:type owl:NamedIndividual ,
+                    :Paciente ;
+           :Sintoma_de :Enfermedad1 ;
+           :Tratada_con :Tratamiento ;
+           :Edad 39 ;
+           :Nombre "Felipe" ;
+           :Numero_Seguro_Social "12312312AAA" ;
+           :Peso "80.0"^^xsd:float .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Sintoma1
+:Sintoma1 rdf:type owl:NamedIndividual ;
+          :Codigo "A334" ;
+          :Nombre "Fibre" .
+
+
+###  http://www.semanticweb.org/feliperosero/ontologies/2025/8/untitled-ontology-5#Tratamiento
+:Tratamiento rdf:type owl:NamedIndividual ;
+             :Codigo "A22" ;
+             :Nombre "Paracetamol" .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
